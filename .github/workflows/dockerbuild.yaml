@@ -6,7 +6,7 @@ on:
       - 'master'
 
 jobs:
-  bake:
+  docker-build:
     runs-on: ubuntu-latest
     steps:
       -
@@ -26,5 +26,17 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: vitragshah/bcsn:latest
+          tags: vitragshah/bcsn:${{ github.ref_name }}
+
+      - name: change image name         
+        run : snap install yq &&  yq '.spec.template.spec.containers.[0].image = "vitragshah/bcsn:${{ github.ref_name }}"' K8/deployment.yaml  
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
 
